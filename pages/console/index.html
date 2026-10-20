@@ -34,9 +34,6 @@
           <button class="nav-item" type="button" data-tab="autoreply">
             <span class="nav-icon">↺</span><span>自动回复</span>
           </button>
-          <button class="nav-item" type="button" data-tab="settings">
-            <span class="nav-icon">⚙</span><span>设置</span>
-          </button>
         </nav>
 
         <div class="sidebar-foot">
@@ -116,7 +113,7 @@
             <div class="quick-actions">
               <button class="btn primary" type="button" data-goto="dm">发一条 B 站私信</button>
               <button class="btn ghost" type="button" data-goto="subs">管理订阅</button>
-              <button class="btn ghost" type="button" data-goto="autoreply">自动回复设置</button>
+              <button class="btn ghost" type="button" data-goto="autoreply">自动回复状态</button>
             </div>
           </div>
         </section>
@@ -258,46 +255,13 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>自动回复设置</h3></div>
-            <div id="autoreplyFields"></div>
-            <div class="form-actions">
-              <button id="saveAutoBtn" class="btn primary" type="button">保存自动回复设置</button>
-            </div>
-          </div>
-        </section>
-
-        <section id="tab-settings" class="tab hidden">
-          <div class="card">
-            <div class="card-head"><h3>通用设置</h3></div>
-            <div id="settingsFields"></div>
-            <div class="notify-block">
-              <span class="field-label">订阅推送类型</span>
-              <div class="checks">
-                <label><input id="notifyVideo" type="checkbox" /> 新投稿</label>
-                <label><input id="notifyDynamic" type="checkbox" /> 新动态</label>
-                <label><input id="notifyLive" type="checkbox" /> 开播</label>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button id="saveSettingsBtn" class="btn primary" type="button">保存通用设置</button>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-head"><h3>账号 Cookie</h3></div>
+            <div class="card-head"><h3>开关与参数在插件配置页</h3></div>
             <p class="muted">
-              扫码登录会自动保存 Cookie；也可以在下面粘贴浏览器 Cookie（至少 SESSDATA + bili_jct）。
-              输入框不会回显已有 Cookie。
+              本页只负责查看状态和执行动作。自动回复总开关、评论/私信开关、轮询间隔、模板、
+              白名单、dry-run 等都在
+              <strong>AstrBot WebUI → 插件管理 → Neko BiliRelay → 插件配置</strong>
+              里修改；保存后按 AstrBot 的提示重载插件即可。
             </p>
-            <div class="form-grid">
-              <label class="field full">
-                <span>新的 Cookie</span>
-                <textarea id="cookieInput" rows="3" placeholder="SESSDATA=...; bili_jct=...;"></textarea>
-              </label>
-            </div>
-            <div class="form-actions">
-              <button id="saveCookieBtn" class="btn primary" type="button">保存并应用 Cookie</button>
-            </div>
           </div>
         </section>
 
