@@ -2,6 +2,7 @@
   "name": "dsh-bili-scroll",
   "version": "0.1.19",
   "description": "DSH 插件：每天替你刷一轮 B站 —— 读字幕挑出值得的、写一份日报，值得的就 @ 你；支持自动回复评论/私信",
+  "author": "c1overzz",
   "keywords": [
     "dsh",
     "dsh-plugin",

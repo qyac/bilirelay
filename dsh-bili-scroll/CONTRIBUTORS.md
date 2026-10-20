@@ -5,6 +5,7 @@
 
 | 人 | 采纳了什么 |
 |---|---|
+| [@c1overzz](https://github.com/c1overzz) | `dsh-bili-scroll` 上游作者；本仓库保留其 MIT 许可与署名 |
 | [@wotorrrrr](https://github.com/wotorrrrr) | `uv venv` 钉 Python 3.10–3.13（3.14+ 没有 `av` / `ctranslate2` 的 wheel）；私信模式必须把 `bili_send_message` 放进 MCP 白名单；数组类设置不能用 `!==` 比默认值 |
 | [@Rookiexg](https://github.com/Rookiexg) | headless overlay 要补 `agent-default-model`，否则账号登录的机器会 `MISSING_CREDENTIAL`（PR #50） |
 | [@383891598](https://github.com/383891598) | yt-dlp 的进度条会污染 stdout，导致"输出非空 = 成功"恒真（PR #23，部分采纳） |

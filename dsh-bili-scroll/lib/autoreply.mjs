@@ -9,7 +9,9 @@
  *   本文件的设计、去重/冷却/基线策略与默认字段，移植并改写自 **Neko BiliRelay**
  *   （AstrBot 插件 `astrbot_plugin_bilirelay`，MIT，Copyright (c) 2026 NekoHome）：
  *   https://github.com/qyac/bilirelay
- *   原实现使用自建 B 站 HTTP 客户端；这里改为复用本仓库内置的 bilibili-mcp
+ *   原始实现使用自建 B 站 HTTP 客户端；这里改为复用本仓库内置的 bilibili-mcp
+ *   本文件所在仓库基于 **c1overzz/dsh-bili-scroll**（MIT，Copyright (c) 2026 c1overzz）：
+ *   https://github.com/c1overzz/dsh-bili-scroll
  *   （bilibili-api-python），只保留「轮询 → 判断 → 模板回复」这一层。
  *   上游 bilibili-mcp 的 MIT 署名见 vendor/bilibili-mcp/LICENSE 与仓库 NOTICE.md。
  *

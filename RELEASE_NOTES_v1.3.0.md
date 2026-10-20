@@ -23,7 +23,11 @@
 - **评论 / 私信自动回复**：默认关；首次基线、rpid/msg_key 去重、冷却、每轮上限、私信白名单、dry-run。
 - 保存 WebUI 设置后尽量热应用，不需要重启。
 
-### dsh-bili-scroll 0.1.19
+### dsh-bili-scroll 0.1.19（基于 c1overzz/dsh-bili-scroll）
+
+> **上游署名**：`dsh-bili-scroll` 原作者 **c1overzz**，
+> <https://github.com/c1overzz/dsh-bili-scroll>，MIT，Copyright (c) 2026 c1overzz。
+> 本发布包保留上游 `LICENSE` 与 `NOTICE.md`；0.1.19 仅在 0.1.18 基础上新增自动回复。
 
 - 新增 `lib/autoreply.mjs` 自动回复引擎；
 - MCP 新增 `bili_latest_comments` / `bili_my_videos` / `bili_dm_sessions` / `bili_dm_messages`；
@@ -41,9 +45,9 @@
 | `SHA256SUMS.txt` | 上述文件的 SHA-256 |
 
 ```text
-42a46fc3530025a555aadef0255c5090d760b3d7c0c9b23a70c011bddc6d8d23  astrbot_plugin_bilirelay-1.3.0.zip
-6daefdc86d29e219f4007e3bc6bd63db026f79035a03ca182c8feb65d611d9fe  dsh-bili-scroll-0.1.19.zip
-85a4ba60c5b84b83989efbc64c8e5ec207d21ec9d89eb71179d1331f4c736e0c  dsh-bili-scroll-0.1.19.tgz
+f564d24155be9daf1cb038440afc5d9702bb9716f586dda88067b88e5c735605  astrbot_plugin_bilirelay-1.3.0.zip
+172f674a9714cd79c1ef244c6782533ccd9d01dc7c41075790458cfe4570906e  dsh-bili-scroll-0.1.19.zip
+c8f7e74c011e4abf7ba9fe24892f72bbaf0e8f730fc036ac0fb763e1bb25e975  dsh-bili-scroll-0.1.19.tgz
 ```
 
 校验：
@@ -95,6 +99,9 @@ dsh plugin --profile web add ./dsh-bili-scroll-0.1.19.tgz
 ## 出处与许可
 
 - 本插件：MIT，Copyright (c) 2026 NekoHome。
+- `dsh-bili-scroll/`：来自 **c1overzz/dsh-bili-scroll**，MIT，Copyright (c) 2026 c1overzz，
+  <https://github.com/c1overzz/dsh-bili-scroll>；本仓库保留其 LICENSE 版权行与 NOTICE，
+  0.1.19 新增部分为自动回复。
 - 自动回复设计来源：**Neko BiliRelay**（`astrbot_plugin_bilirelay`），
   <https://github.com/qyac/bilirelay>。
 - 内置 `vendor/bilibili-mcp`：MIT，Copyright (c) 2026 AGI_Ananas。

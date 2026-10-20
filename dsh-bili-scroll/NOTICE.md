@@ -2,6 +2,15 @@
 
 本插件（`dsh-bili-scroll` / 刷B站）本体以 **MIT** 协议发布，正文见仓库根目录的 `LICENSE`。
 
+## 上游项目
+
+`dsh-bili-scroll/` 来自 **c1overzz/dsh-bili-scroll**：
+
+- 项目：<https://github.com/c1overzz/dsh-bili-scroll>
+- 许可证：**MIT**，Copyright (c) 2026 c1overzz
+- 本仓库在 0.1.18 的基础上新增了评论 / 私信自动回复（0.1.19），
+  其余代码、文档、提示词与设置页均归上游作者；`LICENSE` 中保留原始版权行。
+
 ## 内含第三方代码
 
 - 目录：`vendor/bilibili-mcp/`

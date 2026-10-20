@@ -310,6 +310,11 @@ pages/console/              WebUI 控制台（账号 / 私信 / 订阅 / 自动�
 新增 `lib/autoreply.mjs`、MCP 读取工具、宿主定时器与设置页；出处与 MIT 署名见该目录的
 [NOTICE.md](dsh-bili-scroll/NOTICE.md) 与 [CHANGELOG.md](dsh-bili-scroll/CHANGELOG.md)（0.1.19）。
 
+> **上游署名**：`dsh-bili-scroll` 的原作者是 **c1overzz**
+> （<https://github.com/c1overzz/dsh-bili-scroll>，MIT，Copyright (c) 2026 c1overzz）。
+> 本仓库保留其 `LICENSE` 版权行与 `NOTICE.md`；0.1.19 只是在 0.1.18 基础上增加了自动回复，
+> 其余代码、文档、提示词和设置页均归上游作者。
+
 ## 声明与致谢
 
 - 本插件是个人自用项目，与哔哩哔哩官方无关，未获得官方授权。
