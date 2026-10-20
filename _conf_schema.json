@@ -1,0 +1,351 @@
+{
+  "cookie": {
+    "type": "string",
+    "description": "B 站 Cookie（可选）",
+    "hint": "填写浏览器登录 bilibili.com 后复制的 Cookie，或留空使用 WebUI 插件页扫码登录。至少需要 SESSDATA；不要分享给他人。",
+    "obvious_hint": true,
+    "secret": true,
+    "default": ""
+  },
+  "enable_llm_tools": {
+    "type": "bool",
+    "description": "启用 LLM 工具",
+    "hint": "开启后，大模型可以在对话中自动调用 B 站搜索、视频、评论、动态等工具。",
+    "default": true
+  },
+  "llm_tools": {
+    "type": "object",
+    "description": "LLM 工具开关",
+    "hint": "可以单独关闭不需要的工具，减少工具 schema 占用。",
+    "items": {
+      "bilibili_search": {
+        "type": "bool",
+        "description": "搜索 B 站内容",
+        "default": true
+      },
+      "bilibili_video": {
+        "type": "bool",
+        "description": "视频详情",
+        "default": true
+      },
+      "bilibili_video_summary": {
+        "type": "bool",
+        "description": "视频 AI 总结",
+        "default": true
+      },
+      "bilibili_video_subtitle": {
+        "type": "bool",
+        "description": "视频字幕",
+        "default": true
+      },
+      "bilibili_video_comments": {
+        "type": "bool",
+        "description": "视频评论",
+        "default": true
+      },
+      "bilibili_video_danmaku": {
+        "type": "bool",
+        "description": "视频弹幕",
+        "default": false
+      },
+      "bilibili_user": {
+        "type": "bool",
+        "description": "UP 主资料",
+        "default": true
+      },
+      "bilibili_user_videos": {
+        "type": "bool",
+        "description": "UP 主投稿",
+        "default": true
+      },
+      "bilibili_user_dynamics": {
+        "type": "bool",
+        "description": "UP 主动态",
+        "default": true
+      },
+      "bilibili_live": {
+        "type": "bool",
+        "description": "直播状态",
+        "default": true
+      },
+      "bilibili_hot": {
+        "type": "bool",
+        "description": "热门视频",
+        "default": true
+      },
+      "bilibili_rank": {
+        "type": "bool",
+        "description": "排行榜",
+        "default": false
+      },
+      "bilibili_article": {
+        "type": "bool",
+        "description": "专栏文章",
+        "default": true
+      },
+      "bilibili_bangumi": {
+        "type": "bool",
+        "description": "番剧信息",
+        "default": true
+      },
+      "bilibili_fav": {
+        "type": "bool",
+        "description": "收藏夹",
+        "default": false
+      }
+    }
+  },
+  "enable_subscriptions": {
+    "type": "bool",
+    "description": "启用订阅推送",
+    "hint": "定时检查已订阅 UP 主的投稿、动态和开播状态，并主动推送。",
+    "default": true
+  },
+  "subscription_interval": {
+    "type": "int",
+    "description": "订阅检查间隔（分钟）",
+    "hint": "默认 5 分钟。过于频繁可能触发 B 站风控，建议不低于 3 分钟。",
+    "default": 5
+  },
+  "subscription_notify": {
+    "type": "object",
+    "description": "订阅推送类型",
+    "items": {
+      "video": {
+        "type": "bool",
+        "description": "新投稿",
+        "default": true
+      },
+      "dynamic": {
+        "type": "bool",
+        "description": "新动态",
+        "default": true
+      },
+      "live": {
+        "type": "bool",
+        "description": "开播提醒",
+        "default": true
+      }
+    }
+  },
+  "max_subscriptions": {
+    "type": "int",
+    "description": "每个会话最多订阅 UP 数",
+    "default": 20
+  },
+  "push_cover": {
+    "type": "bool",
+    "description": "推送时附带封面图",
+    "hint": "部分平台对图片外链支持不好，默认关闭。",
+    "default": false
+  },
+  "login_qr_in_chat": {
+    "type": "bool",
+    "description": "在聊天中发送登录二维码",
+    "hint": "关闭后，/bili login 只返回登录链接；扫码请前往 WebUI 插件页面。",
+    "default": true
+  },
+  "request_interval": {
+    "type": "float",
+    "description": "请求最小间隔（秒）",
+    "hint": "用于降低风控概率，默认 0.45 秒。",
+    "default": 0.45
+  },
+  "timeout": {
+    "type": "int",
+    "description": "HTTP 超时（秒）",
+    "default": 15
+  },
+  "cache_ttl": {
+    "type": "int",
+    "description": "接口缓存时间（秒）",
+    "hint": "0 表示禁用缓存。",
+    "default": 90
+  },
+  "max_reply_chars": {
+    "type": "int",
+    "description": "单条回复最大字符数",
+    "default": 1800
+  },
+  "enable_auto_reply": {
+    "type": "bool",
+    "description": "启用评论/私信自动回复",
+    "hint": "默认关闭。开启后还需要分别开启 auto_reply_comments / auto_reply_dms，并登录 B 站账号。",
+    "default": false
+  },
+  "auto_reply_provider": {
+    "type": "string",
+    "description": "自动回复使用的 LLM Provider",
+    "hint": "留空时自动选择当前默认对话模型；建议选择一个便宜且稳定的模型。",
+    "_special": "select_provider",
+    "default": ""
+  },
+  "auto_reply_system_prompt": {
+    "type": "text",
+    "description": "自动回复系统提示词",
+    "hint": "留空使用内置提示词。可以在这里设置人设、语气和禁止事项。",
+    "default": ""
+  },
+  "auto_reply_max_chars": {
+    "type": "int",
+    "description": "自动回复最大字数",
+    "default": 200
+  },
+  "auto_reply_reply_interval": {
+    "type": "float",
+    "description": "两条自动回复之间的最小间隔（秒）",
+    "default": 3
+  },
+  "auto_reply_dry_run": {
+    "type": "bool",
+    "description": "仅记录不发送（dry-run）",
+    "hint": "开启后只写日志，不真正发评论/私信，适合先观察生成效果。",
+    "default": false
+  },
+  "auto_reply_comments": {
+    "type": "bool",
+    "description": "自动回复视频评论",
+    "default": true
+  },
+  "comment_targets": {
+    "type": "string",
+    "description": "要监控评论的视频 BV 号",
+    "hint": "多个用逗号分隔。留空时自动监控自己最近的投稿（comment_auto_videos=true）。",
+    "default": ""
+  },
+  "comment_auto_videos": {
+    "type": "bool",
+    "description": "自动监控自己的最近投稿",
+    "default": true
+  },
+  "comment_video_limit": {
+    "type": "int",
+    "description": "自动监控的最近投稿数量",
+    "default": 5
+  },
+  "comment_poll_interval": {
+    "type": "int",
+    "description": "评论轮询间隔（秒）",
+    "hint": "建议不低于 120 秒。",
+    "default": 180
+  },
+  "comment_include_replies": {
+    "type": "bool",
+    "description": "也回复二级/楼中楼评论",
+    "default": false
+  },
+  "comment_max_per_round": {
+    "type": "int",
+    "description": "每轮最多回复评论数",
+    "default": 3
+  },
+  "comment_cooldown_minutes": {
+    "type": "int",
+    "description": "同一用户评论回复冷却（分钟）",
+    "default": 30
+  },
+  "comment_max_age_minutes": {
+    "type": "int",
+    "description": "只回复多少分钟内的新评论",
+    "default": 180
+  },
+  "comment_min_chars": {
+    "type": "int",
+    "description": "评论最短字数",
+    "default": 2
+  },
+  "comment_ignore_keywords": {
+    "type": "string",
+    "description": "评论忽略关键词",
+    "hint": "命中任一关键词就不回复，多个用逗号分隔。",
+    "default": ""
+  },
+  "comment_reply_mode": {
+    "type": "string",
+    "description": "评论回复生成方式",
+    "options": [
+      "llm",
+      "template"
+    ],
+    "default": "llm"
+  },
+  "comment_template": {
+    "type": "text",
+    "description": "评论模板回复",
+    "hint": "模板模式使用；可用变量：{user} {content} {title} {bvid} {max}。",
+    "default": "感谢你的评论，{user}！"
+  },
+  "auto_reply_dms": {
+    "type": "bool",
+    "description": "自动回复私信",
+    "default": false
+  },
+  "dm_allow_all": {
+    "type": "bool",
+    "description": "回复所有私信用户",
+    "hint": "默认关闭。关闭时只有 dm_whitelist 里的 UID 会收到自动回复，避免对陌生人刷屏。",
+    "default": false
+  },
+  "dm_whitelist": {
+    "type": "string",
+    "description": "私信白名单 UID",
+    "hint": "多个用逗号分隔；dm_allow_all=false 时必填。",
+    "default": ""
+  },
+  "dm_blacklist": {
+    "type": "string",
+    "description": "私信黑名单 UID",
+    "hint": "多个用逗号分隔，优先级高于白名单。",
+    "default": ""
+  },
+  "dm_poll_interval": {
+    "type": "int",
+    "description": "私信轮询间隔（秒）",
+    "default": 120
+  },
+  "dm_max_per_round": {
+    "type": "int",
+    "description": "每轮最多回复私信数",
+    "default": 3
+  },
+  "dm_cooldown_minutes": {
+    "type": "int",
+    "description": "同一用户私信回复冷却（分钟）",
+    "default": 10
+  },
+  "dm_max_age_minutes": {
+    "type": "int",
+    "description": "只回复多少分钟内的新私信",
+    "default": 180
+  },
+  "dm_min_chars": {
+    "type": "int",
+    "description": "私信最短字数",
+    "default": 1
+  },
+  "dm_ignore_keywords": {
+    "type": "string",
+    "description": "私信忽略关键词",
+    "default": ""
+  },
+  "dm_context_messages": {
+    "type": "int",
+    "description": "生成私信回复时携带的历史消息条数",
+    "default": 6
+  },
+  "dm_reply_mode": {
+    "type": "string",
+    "description": "私信回复生成方式",
+    "options": [
+      "llm",
+      "template"
+    ],
+    "default": "llm"
+  },
+  "dm_template": {
+    "type": "text",
+    "description": "私信模板回复",
+    "hint": "可用变量：{user} {content} {title} {max}。",
+    "default": "你好，{user}！"
+  }
+}

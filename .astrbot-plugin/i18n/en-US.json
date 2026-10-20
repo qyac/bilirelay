@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "display_name": "Neko BiliRelay",
+    "short_desc": "Bilibili search, lookup, subscriptions and QR login"
+  },
+  "views": {
+    "login": {
+      "title": "Bilibili Account & Subscriptions",
+      "description": "Scan to sign in, inspect login state and subscription summary.",
+      "heading": "Bilibili Account",
+      "subheading": "Sign in to read AI subtitles and video summaries with fewer risk-control errors.",
+      "guest": "Guest mode",
+      "logged_in": "Signed in",
+      "scan_hint": "Scan the QR code with the Bilibili mobile app",
+      "generate": "Generate login QR code",
+      "refresh": "Refresh",
+      "logout": "Sign out",
+      "waiting": "Waiting for scan…",
+      "scanned": "Scanned, confirm on your phone",
+      "expired": "QR code expired, generate a new one",
+      "success": "Signed in",
+      "failed": "Request failed",
+      "subs": "Subscription overview",
+      "subs_total": "Subscriptions",
+      "subs_sessions": "Sessions",
+      "subs_ups": "UP hosts",
+      "subs_empty": "No subscriptions yet. Send /bili sub add <UID> in chat.",
+      "poller": "Background poller",
+      "poller_running": "Running",
+      "poller_stopped": "Stopped",
+      "last_check": "Last check",
+      "never": "Never",
+      "uid": "UID",
+      "types": "Types",
+      "sessions": "Sessions",
+      "loading": "Loading…",
+      "note": "Credentials are stored locally under AstrBot plugin_data and are never uploaded to third parties.",
+      "autoreply": "Auto reply",
+      "autoreply_disabled": "Disabled",
+      "autoreply_comments": "Comments",
+      "autoreply_dms": "DMs"
+    }
+  },
+  "pages": {
+    "login": {
+      "title": "Bilibili Account & Subscriptions",
+      "description": "Scan to sign in, inspect login state and subscription summary.",
+      "heading": "Bilibili Account"
+    }
+  }
+}

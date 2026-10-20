@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "display_name": "Neko BiliRelay",
+    "short_desc": "B 站搜索、查询、订阅推送与扫码登录"
+  },
+  "views": {
+    "login": {
+      "title": "B 站账号与订阅",
+      "description": "扫码登录 B 站、查看登录态和订阅概览。",
+      "heading": "B 站账号",
+      "subheading": "登录后可读取 AI 字幕、视频总结，并降低接口风控概率。",
+      "guest": "当前为游客模式",
+      "logged_in": "已登录",
+      "scan_hint": "使用 B 站手机客户端扫描二维码",
+      "generate": "生成登录二维码",
+      "refresh": "刷新状态",
+      "logout": "退出登录",
+      "waiting": "等待扫码…",
+      "scanned": "已扫码，请在手机上确认",
+      "expired": "二维码已失效，请重新生成",
+      "success": "登录成功",
+      "failed": "操作失败",
+      "subs": "订阅概览",
+      "subs_total": "订阅总数",
+      "subs_sessions": "会话数",
+      "subs_ups": "UP 主数",
+      "subs_empty": "还没有任何订阅。在聊天中发送 /bili sub add <UID> 即可添加。",
+      "poller": "后台轮询",
+      "poller_running": "运行中",
+      "poller_stopped": "未运行",
+      "last_check": "上次检查",
+      "never": "尚未检查",
+      "uid": "UID",
+      "types": "类型",
+      "sessions": "订阅会话数",
+      "loading": "加载中…",
+      "note": "登录凭据仅保存在本机 AstrBot 的 plugin_data 目录，不会上传到第三方。",
+      "autoreply": "自动回复",
+      "autoreply_disabled": "未启用",
+      "autoreply_comments": "评论",
+      "autoreply_dms": "私信"
+    }
+  },
+  "pages": {
+    "login": {
+      "title": "B 站账号与订阅",
+      "description": "扫码登录 B 站、查看登录态和订阅概览。",
+      "heading": "B 站账号"
+    }
+  }
+}
