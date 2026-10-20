@@ -2,7 +2,7 @@
 
 让 AstrBot **完整接入 Bilibili** 的插件：把 B 站搜索、视频/UP 主/动态/直播/番剧/专栏查询、字幕与 AI 总结、热门榜单，做成聊天指令和 **LLM 工具**；同时支持 UP 主**新投稿 / 新动态 / 开播**的主动订阅推送、**评论 / 私信自动回复**，以及 WebUI 扫码登录。
 
-> 插件名：`astrbot_plugin_bilirelay` · 版本：`1.1.0` · 作者：NekoHome
+> 插件名：`astrbot_plugin_bilirelay` · 版本：`1.2.0` · 作者：NekoHome
 
 ## 功能
 
@@ -36,6 +36,7 @@
 | `/bili autoreply on` / `off` | 启动 / 停止自动回复任务（仅管理员） |
 | `/bili autoreply test <文本>` | 预览一条自动回复，不发送（仅管理员） |
 | `/bili autoreply reset` | 清空去重状态并重新建立基线（仅管理员） |
+| `/bili send <UID/self> <文本>` | 用 B 站账号主动发一条私信（默认仅管理员） |
 
 指令组别名：`/bili`、`/b站`、`/哔哩哔哩`。
 
@@ -43,9 +44,9 @@
 
 开启后，大模型可以在对话中自动调用：
 
-`bilibili_search`、`bilibili_video`、`bilibili_video_summary`、`bilibili_video_subtitle`、`bilibili_video_comments`、`bilibili_video_danmaku`、`bilibili_user`、`bilibili_user_videos`、`bilibili_user_dynamics`、`bilibili_live`、`bilibili_hot`、`bilibili_rank`、`bilibili_article`、`bilibili_bangumi`、`bilibili_fav`。
+`bilibili_search`、`bilibili_video`、`bilibili_video_summary`、`bilibili_video_subtitle`、`bilibili_video_comments`、`bilibili_video_danmaku`、`bilibili_user`、`bilibili_user_videos`、`bilibili_user_dynamics`、`bilibili_live`、`bilibili_hot`、`bilibili_rank`、`bilibili_article`、`bilibili_bangumi`、`bilibili_fav`、`bilibili_send_dm`。
 
-所有工具都可以在配置里单独关闭，避免工具 schema 占用过多上下文。弹幕、排行榜、收藏夹工具默认关闭。
+所有工具都可以在配置里单独关闭，避免工具 schema 占用过多上下文。弹幕、排行榜、收藏夹、主动私信工具默认关闭。主动私信还要求 `enable_llm_send_dm=true` 且对方在 `llm_send_dm_whitelist` 中。
 
 ### 订阅推送
 
@@ -79,6 +80,19 @@
 > 修改自动回复相关配置后，建议在 WebUI 重载插件，或先 `/bili autoreply off` 再 `/bili autoreply on`，让新的轮询间隔/白名单生效。
 
 > B 站对评论/私信发送有严格频率限制。未绑定手机号的账号可能无法发私信（错误码 `21015`），发送过快会触发 `21020/21046`。插件会限制每轮数量并做冷却，但请自行控制频率，避免账号被限制。
+
+### 主动发 B 站私信
+
+除“自动回复”外，也可以让插件**主动**用你的 B 站账号发私信：
+
+- **聊天指令**：`/bili send <UID/self> <文本>`。默认仅管理员可用；`self` 表示发给自己，适合先测试。
+- **LLM 工具**：`bilibili_send_dm`。默认关闭；开启 `enable_llm_send_dm` 后，仍只允许发给 `llm_send_dm_whitelist` 里的 UID（或自己）。
+- **订阅转发**：`subscription_dm_uid` + `subscription_dm_mode` 可把新投稿/新动态/开播推送转发到 B 站私信；
+  `mode=both` 同时发聊天，`mode=only` 只发私信（发送失败会自动回退聊天）。
+- **dry-run**：`send_dm_dry_run=true` 时命令/工具只预览不发送，方便确认内容。
+
+> 私信会拿你的号主动打扰别人，也可能触发 B 站频率限制；默认仅管理员、默认关闭 LLM 工具、默认白名单。
+> 未绑定手机号的账号可能无法发私信。
 
 ### 扫码登录
 
@@ -132,6 +146,12 @@ AstrBot 本身通常已经带有 `httpx` 和 `Pillow`；`qrcode` 用于扫码登
 | `max_subscriptions` | int | `20` | 每个会话最多订阅的 UP 数 |
 | `push_cover` | bool | `false` | 推送时附带封面图 |
 | `login_qr_in_chat` | bool | `true` | 允许在聊天中发送登录二维码 |
+| `send_dm_admin_only` | bool | `true` | `/bili send` 仅管理员可用 |
+| `send_dm_dry_run` | bool | `false` | 主动私信只预览不发送 |
+| `enable_llm_send_dm` | bool | `false` | 允许 LLM 工具主动发私信 |
+| `llm_send_dm_whitelist` | string | 空 | LLM 主动私信白名单 UID |
+| `subscription_dm_uid` | string | 空 | 订阅推送转发到 B 站私信的目标 UID；可填 `self` |
+| `subscription_dm_mode` | string | `off` | `off` / `both` / `only` |
 | `request_interval` | float | `0.45` | 请求最小间隔（秒），用于降低风控 |
 | `timeout` | int | `15` | HTTP 超时（秒） |
 | `cache_ttl` | int | `90` | 接口缓存时间（秒），`0` 关闭 |

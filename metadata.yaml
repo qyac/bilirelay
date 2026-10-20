@@ -1,8 +1,8 @@
 name: astrbot_plugin_bilirelay
 display_name: Neko BiliRelay
-desc: 让 AstrBot 完整接入 Bilibili：搜索、视频/UP主/动态/直播/番剧/专栏查询、字幕与 AI 总结、LLM 工具、UP 主更新与开播订阅推送、评论与私信自动回复，以及 WebUI 扫码登录。
-short_desc: B 站搜索、查询、订阅推送、自动回复与扫码登录
-version: 1.1.0
+desc: 让 AstrBot 完整接入 Bilibili：搜索、视频/UP主/动态/直播/番剧/专栏查询、字幕与 AI 总结、LLM 工具、UP 主更新与开播订阅推送、评论与私信自动回复、主动私信，以及 WebUI 扫码登录。
+short_desc: B 站搜索、查询、订阅推送、自动回复、主动私信与扫码登录
+version: 1.2.0
 author: NekoHome
 repo: https://github.com/qyac/bilirelay
 astrbot_version: ">=4.16,<5"

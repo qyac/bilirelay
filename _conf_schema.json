@@ -92,6 +92,11 @@
         "type": "bool",
         "description": "收藏夹",
         "default": false
+      },
+      "bilibili_send_dm": {
+        "type": "bool",
+        "description": "主动发送私信",
+        "default": false
       }
     }
   },
@@ -347,5 +352,43 @@
     "description": "私信模板回复",
     "hint": "可用变量：{user} {content} {title} {max}。",
     "default": "你好，{user}！"
+  },
+  "enable_llm_send_dm": {
+    "type": "bool",
+    "description": "允许 LLM 工具主动发私信",
+    "hint": "默认关闭。开启后仍需 llm_send_dm_whitelist 白名单（或发给自己）。",
+    "default": false
+  },
+  "llm_send_dm_whitelist": {
+    "type": "string",
+    "description": "LLM 主动私信白名单 UID",
+    "hint": "逗号分隔；只有这些 UID 会收到 LLM 工具发出的私信。",
+    "default": ""
+  },
+  "send_dm_admin_only": {
+    "type": "bool",
+    "description": "/bili send 仅管理员可用",
+    "default": true
+  },
+  "send_dm_dry_run": {
+    "type": "bool",
+    "description": "主动私信只预览不发送（dry-run）",
+    "default": false
+  },
+  "subscription_dm_uid": {
+    "type": "string",
+    "description": "订阅推送转发到 B 站私信的目标 UID",
+    "hint": "留空关闭；可填 self 发给自己。",
+    "default": ""
+  },
+  "subscription_dm_mode": {
+    "type": "string",
+    "description": "订阅推送投递方式",
+    "options": [
+      "off",
+      "both",
+      "only"
+    ],
+    "default": "off"
   }
 }

@@ -63,7 +63,7 @@ from .bilirelay.subscriptions import (
 )
 
 PLUGIN_NAME = "astrbot_plugin_bilirelay"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 GROUP_NAMES = {"bili", "b站", "哔哩哔哩"}
 
 TOOL_NAMES = (
@@ -82,6 +82,7 @@ TOOL_NAMES = (
     "bilibili_article",
     "bilibili_bangumi",
     "bilibili_fav",
+    "bilibili_send_dm",
 )
 
 HELP_TEXT = """📺 Neko BiliRelay — B 站指令
@@ -113,6 +114,9 @@ HELP_TEXT = """📺 Neko BiliRelay — B 站指令
 /bili sub del <UID>            取消订阅
 /bili sub list                 查看本会话订阅
 /bili sub check                立即检查一轮
+
+✉️ 主动私信
+/bili send <UID/self> <文本>   用 B 站账号主动发一条私信
 
 🤖 自动回复（管理员）
 /bili autoreply status         查看自动回复状态
@@ -233,6 +237,8 @@ class BiliRelayPlugin(Star):
     def _tool_enabled(self, name: str) -> bool:
         if not bool(self.config.get("enable_llm_tools", True)):
             return False
+        if name == "bilibili_send_dm" and not bool(self.config.get("enable_llm_send_dm", False)):
+            return False
         raw = self.config.get("llm_tools") or {}
         if isinstance(raw, dict) and name in raw:
             return bool(raw[name])
@@ -260,7 +266,38 @@ class BiliRelayPlugin(Star):
                 self.logger.debug("切换工具 %s 状态失败：%s", name, exc)
 
     # ------------------------------------------------------------------ 推送
+    async def _resolve_dm_uid(self, ref: str) -> int:
+        """把 ``self`` / ``me`` / UID 解析成接收者 UID。"""
+        text = str(ref or "").strip()
+        if text.lower() in ("self", "me", "我", "自己", "自己号"):
+            uid = int((self.auth.user or {}).get("uid") or 0)
+            if not uid:
+                uid = int(self.client.cookies.get("DedeUserID") or 0)
+            if not uid:
+                try:
+                    await self.auth.refresh_user(force=True)
+                except Exception:  # noqa: BLE001
+                    pass
+                uid = int((self.auth.user or {}).get("uid") or 0)
+            return uid
+        return parse_uid(text) or 0
+
+    async def _send_bili_dm(self, uid: int, text: str) -> None:
+        """主动发一条 B 站私信（文本）。"""
+        await self.api.send_dm(uid, truncate(text, 500, suffix=""))
+
     async def _send_push(self, umo: str, text: str, cover_url: str = "") -> None:
+        """订阅推送：按配置转发到 B 站私信，或继续发到聊天。"""
+        mode = str(self.config.get("subscription_dm_mode", "off") or "off").lower()
+        dm_uid = await self._resolve_dm_uid(str(self.config.get("subscription_dm_uid", "") or ""))
+        if dm_uid and mode in ("both", "only"):
+            try:
+                await self._send_bili_dm(dm_uid, text)
+                self.logger.info("订阅推送已转发到 B 站私信 UID %s", dm_uid)
+                if mode == "only":
+                    return
+            except Exception as exc:  # noqa: BLE001
+                self.logger.warning("订阅推送转发 B 站私信失败，回退到聊天：%s", exc)
         chain = MessageChain().message(self._clip(text))
         if cover_url and bool(self.config.get("push_cover", False)):
             try:
@@ -752,6 +789,38 @@ class BiliRelayPlugin(Star):
             text = self._error(exc)
         yield event.plain_result(self._clip(text))
 
+    @bili.command("send", alias={"私信", "发私信", "dm"})
+    async def bili_send(self, event: AstrMessageEvent):
+        """主动给 B 站用户发一条私信。默认仅管理员可用。"""
+        if bool(self.config.get("send_dm_admin_only", True)) and not event.is_admin():
+            yield event.plain_result("❌ 主动私信默认仅管理员可用（可关闭 send_dm_admin_only）。")
+            return
+        raw = self._args(event, {"send", "私信", "发私信", "dm"})
+        parts = split_args(raw)
+        if len(parts) < 2:
+            yield event.plain_result("用法：/bili send <UID/self> <文本>\n例如：/bili send 12345678 你好呀")
+            return
+        target = parts[0]
+        text = " ".join(parts[1:]).strip()
+        if not text:
+            yield event.plain_result("私信内容不能为空。")
+            return
+        try:
+            uid = await self._resolve_dm_uid(target)
+            if not uid:
+                yield event.plain_result("无法识别接收者 UID；也可以填 self 发给自己。")
+                return
+            if bool(self.config.get("send_dm_dry_run", False)):
+                text_out = f"🧪 私信预览（未发送）\nUID {uid}：{truncate(text, 500)}"
+            else:
+                await self._send_bili_dm(uid, text)
+                text_out = f"✅ 已向 UID {uid} 发送 B 站私信。"
+        except BiliError as exc:
+            text_out = self._error(exc)
+        except Exception as exc:  # noqa: BLE001
+            text_out = self._error(exc)
+        yield event.plain_result(self._clip(text_out))
+
     @bili.command("login", alias={"登录"})
     async def bili_login(self, event: AstrMessageEvent):
         status = self.auth.status()
@@ -1097,6 +1166,38 @@ class BiliRelayPlugin(Star):
             return self._clip(format_fav(await self.api.fav(int(media_id)), limit=10))
         except BiliError as exc:
             return f"获取收藏夹失败：{exc.user_message}"
+
+    @filter.llm_tool(name="bilibili_send_dm")
+    async def tool_send_dm(self, event: AstrMessageEvent, uid: str, text: str) -> str:
+        """主动给 B 站用户发送一条私信。只有配置里开启 enable_llm_send_dm、且对方在
+        llm_send_dm_whitelist 中（或发给自己）时才允许，避免被滥用成骚扰工具。
+
+        Args:
+            uid(string): 接收者 UID，也可以填 self 发给自己
+            text(string): 私信正文，建议不超过 200 字
+        """
+        if not bool(self.config.get("enable_llm_send_dm", False)):
+            return "主动私信工具未启用（enable_llm_send_dm=false）。"
+        try:
+            target = await self._resolve_dm_uid(uid)
+            if not target:
+                return "无法识别接收者 UID。"
+            me = await self._resolve_dm_uid("self")
+            whitelist = {
+                parsed
+                for token in split_args(str(self.config.get("llm_send_dm_whitelist", "") or "").replace(",", " ").replace("，", " "))
+                if (parsed := parse_uid(token))
+            }
+            if target != me and target not in whitelist:
+                return "该 UID 不在 llm_send_dm_whitelist 中，已拒绝发送。"
+            if bool(self.config.get("send_dm_dry_run", False)):
+                return f"（dry-run）将向 UID {target} 发送：{truncate(text, 500)}"
+            await self._send_bili_dm(target, text)
+            return f"已向 UID {target} 发送 B 站私信。"
+        except BiliError as exc:
+            return f"发送私信失败：{exc.user_message}"
+        except Exception as exc:  # noqa: BLE001
+            return f"发送私信失败：{exc}"
 
     # ------------------------------------------------------------------ Web API
     def _register_web_apis(self) -> None:
