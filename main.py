@@ -63,7 +63,7 @@ from .bilirelay.subscriptions import (
 )
 
 PLUGIN_NAME = "astrbot_plugin_bilirelay"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 GROUP_NAMES = {"bili", "b站", "哔哩哔哩"}
 
 TOOL_NAMES = (
@@ -138,6 +138,87 @@ def _cfg_number(value: Any, default: int | float, cast: type = int) -> int | flo
         return cast(value)
     except (TypeError, ValueError):
         return default
+
+
+# WebUI 可编辑配置：key -> (类型, 默认值, 最小值/选项, 最大值)
+CONFIG_SPEC: dict[str, dict[str, Any]] = {
+    "enable_llm_tools": {"type": "bool", "default": True},
+    "enable_subscriptions": {"type": "bool", "default": True},
+    "subscription_interval": {"type": "int", "default": 5, "min": 1, "max": 1440},
+    "max_subscriptions": {"type": "int", "default": 20, "min": 1, "max": 200},
+    "push_cover": {"type": "bool", "default": False},
+    "login_qr_in_chat": {"type": "bool", "default": True},
+    "request_interval": {"type": "float", "default": 0.45, "min": 0, "max": 10},
+    "timeout": {"type": "int", "default": 15, "min": 1, "max": 120},
+    "cache_ttl": {"type": "int", "default": 90, "min": 0, "max": 3600},
+    "max_reply_chars": {"type": "int", "default": 1800, "min": 200, "max": 10000},
+    "send_dm_admin_only": {"type": "bool", "default": True},
+    "send_dm_dry_run": {"type": "bool", "default": False},
+    "enable_llm_send_dm": {"type": "bool", "default": False},
+    "llm_send_dm_whitelist": {"type": "string", "default": ""},
+    "subscription_dm_uid": {"type": "string", "default": ""},
+    "subscription_dm_mode": {"type": "string", "default": "off", "options": ["off", "both", "only"]},
+    "enable_auto_reply": {"type": "bool", "default": False},
+    "auto_reply_comments": {"type": "bool", "default": True},
+    "auto_reply_dms": {"type": "bool", "default": False},
+    "auto_reply_dry_run": {"type": "bool", "default": False},
+    "auto_reply_max_chars": {"type": "int", "default": 200, "min": 20, "max": 1000},
+    "auto_reply_reply_interval": {"type": "float", "default": 3, "min": 0, "max": 60},
+    "comment_targets": {"type": "string", "default": ""},
+    "comment_auto_videos": {"type": "bool", "default": True},
+    "comment_video_limit": {"type": "int", "default": 5, "min": 1, "max": 20},
+    "comment_include_replies": {"type": "bool", "default": False},
+    "comment_poll_interval": {"type": "int", "default": 180, "min": 60, "max": 86400},
+    "comment_max_per_round": {"type": "int", "default": 3, "min": 1, "max": 10},
+    "comment_cooldown_minutes": {"type": "int", "default": 30, "min": 1, "max": 1440},
+    "comment_max_age_minutes": {"type": "int", "default": 180, "min": 1, "max": 10080},
+    "comment_min_chars": {"type": "int", "default": 2, "min": 1, "max": 100},
+    "comment_ignore_keywords": {"type": "string", "default": ""},
+    "comment_reply_mode": {"type": "string", "default": "llm", "options": ["llm", "template"]},
+    "comment_template": {"type": "text", "default": "感谢你的评论，{user}！"},
+    "dm_poll_interval": {"type": "int", "default": 120, "min": 60, "max": 86400},
+    "dm_max_per_round": {"type": "int", "default": 3, "min": 1, "max": 10},
+    "dm_cooldown_minutes": {"type": "int", "default": 10, "min": 1, "max": 1440},
+    "dm_max_age_minutes": {"type": "int", "default": 180, "min": 1, "max": 10080},
+    "dm_min_chars": {"type": "int", "default": 1, "min": 1, "max": 100},
+    "dm_ignore_keywords": {"type": "string", "default": ""},
+    "dm_context_messages": {"type": "int", "default": 6, "min": 0, "max": 20},
+    "dm_reply_mode": {"type": "string", "default": "llm", "options": ["llm", "template"]},
+    "dm_template": {"type": "text", "default": "你好，{user}！"},
+    "dm_allow_all": {"type": "bool", "default": False},
+    "dm_whitelist": {"type": "string", "default": ""},
+    "dm_blacklist": {"type": "string", "default": ""},
+}
+
+
+def _cfg_number(value: Any, default: float, cast: type = float) -> float:
+    try:
+        return cast(value)
+    except (TypeError, ValueError):
+        return cast(default)
+
+
+def _coerce_config_value(spec: dict[str, Any], value: Any) -> Any:
+    kind = spec["type"]
+    if kind == "bool":
+        if isinstance(value, str):
+            return value.strip().lower() in ("1", "true", "yes", "on")
+        return bool(value)
+    if kind in ("int", "float"):
+        try:
+            number = int(value) if kind == "int" else float(value)
+        except (TypeError, ValueError):
+            return spec["default"]
+        if "min" in spec:
+            number = max(spec["min"], number)
+        if "max" in spec:
+            number = min(spec["max"], number)
+        return number
+    text = str(value or "")
+    options = spec.get("options")
+    if options and text not in options:
+        return spec["default"]
+    return text
 
 
 class BiliRelayPlugin(Star):
@@ -233,6 +314,47 @@ class BiliRelayPlugin(Star):
         if not isinstance(raw, dict):
             return list(ALL_TYPES)
         return [key for key in ALL_TYPES if bool(raw.get(key, True))] or list(ALL_TYPES)
+
+    def _public_config(self) -> dict[str, Any]:
+        values: dict[str, Any] = {}
+        for key, spec in CONFIG_SPEC.items():
+            values[key] = self.config.get(key, spec["default"])
+        notify = self.config.get("subscription_notify") or {}
+        values["subscription_notify"] = {
+            key: bool(notify.get(key, True)) for key in ("video", "dynamic", "live")
+        }
+        return {
+            "values": values,
+            "cookie_configured": bool(str(self.config.get("cookie", "") or "").strip()),
+            "version": VERSION,
+        }
+
+    async def _apply_runtime_config(self) -> None:
+        """保存设置后尽量让运行时立刻生效（不让用户必须重启）。"""
+        self.client.request_interval = float(
+            _cfg_number(self.config.get("request_interval", 0.45), 0.45, float)
+        )
+        self.client.cache_ttl = int(
+            _cfg_number(self.config.get("cache_ttl", 90), 90, int)
+        )
+        self.poller.interval_seconds = max(
+            60,
+            int(_cfg_number(self.config.get("subscription_interval", 5), 5, int)) * 60,
+        )
+        self.poller.notify = set(self._enabled_push_types())
+        self.subs.max_per_session = max(
+            1, int(_cfg_number(self.config.get("max_subscriptions", 20), 20, int))
+        )
+        if bool(self.config.get("enable_subscriptions", True)):
+            self.poller.start()
+        else:
+            await self.poller.stop()
+        if bool(self.config.get("enable_auto_reply", False)):
+            await self.autoreply.stop()
+            self.autoreply.start()
+        else:
+            await self.autoreply.stop()
+        await self._apply_tool_toggles()
 
     def _tool_enabled(self, name: str) -> bool:
         if not bool(self.config.get("enable_llm_tools", True)):
@@ -1218,11 +1340,160 @@ class BiliRelayPlugin(Star):
             ("login/poll", self.page_login_poll, ["POST"], "轮询扫码登录状态"),
             ("logout", self.page_logout, ["POST"], "退出 B 站登录"),
             ("subs", self.page_subs, ["GET"], "订阅概览"),
+            ("subs/list", self.page_subs_list, ["GET"], "订阅明细"),
+            ("subs/add", self.page_subs_add, ["POST"], "添加订阅"),
+            ("subs/remove", self.page_subs_remove, ["POST"], "删除订阅"),
+            ("send-dm", self.page_send_dm, ["POST"], "主动发送 B 站私信"),
+            ("autoreply/run", self.page_autoreply_run, ["POST"], "立即检查自动回复"),
+            ("autoreply/reset", self.page_autoreply_reset, ["POST"], "重置自动回复状态"),
+            ("config", self.page_config, ["GET", "POST"], "读取/保存插件配置"),
         )
         for path, handler, methods, desc in routes:
             self.context.register_web_api(
                 f"/{PLUGIN_NAME}/{path}", handler, methods, desc
             )
+
+    async def _json_body(self) -> dict[str, Any]:
+        try:
+            body = await request.json(default={})
+        except Exception:  # noqa: BLE001
+            body = {}
+        return body if isinstance(body, dict) else {}
+
+    async def page_config(self):
+        if request.method == "POST":
+            body = await self._json_body()
+            values = body.get("values") or {}
+            if not isinstance(values, dict):
+                return error_response("values 必须是对象", status_code=400)
+            for key, value in values.items():
+                spec = CONFIG_SPEC.get(key)
+                if spec is None:
+                    continue
+                self.config[key] = _coerce_config_value(spec, value)
+            notify = values.get("subscription_notify")
+            if isinstance(notify, dict):
+                self.config["subscription_notify"] = {
+                    key: bool(notify.get(key, True)) for key in ("video", "dynamic", "live")
+                }
+            cookie = body.get("cookie")
+            if cookie is not None and str(cookie).strip():
+                cookie_text = str(cookie).strip()
+                self.config["cookie"] = cookie_text
+                self.auth.config_cookie = cookie_text
+                self.client.update_cookies_from_string(cookie_text)
+                # 手动 Cookie 优先：清掉旧的扫码凭据，避免下次启动时被旧凭据覆盖
+                self.auth.store.clear()
+            try:
+                save = getattr(self.config, "save_config", None)
+                if callable(save):
+                    save()
+            except Exception as exc:  # noqa: BLE001
+                self.logger.exception("保存插件配置失败")
+                return error_response(f"保存配置失败：{exc}", status_code=500)
+            try:
+                await self._apply_runtime_config()
+                if cookie is not None and str(cookie).strip():
+                    await self.auth.refresh_user(force=True)
+            except Exception as exc:  # noqa: BLE001
+                self.logger.warning("应用运行时配置失败：%s", exc)
+            return json_response(self._public_config())
+        return json_response(self._public_config())
+
+    async def page_subs_list(self):
+        items = [sub.to_dict() for sub in self.subs.all()]
+        sessions = sorted({sub.umo for sub in self.subs.all()})
+        return json_response(
+            {"items": items, "sessions": sessions, "counts": self.subs.counts()}
+        )
+
+    async def page_subs_add(self):
+        body = await self._json_body()
+        umo = str(body.get("umo") or "").strip()
+        uid = parse_uid(str(body.get("uid") or ""))
+        raw_types = body.get("types")
+        types = parse_sub_types(raw_types if isinstance(raw_types, list) else [str(raw_types or "")])
+        if not umo:
+            return error_response("请填写会话 UMO", status_code=400)
+        if not uid:
+            return error_response("UID 格式不正确", status_code=400)
+        name = ""
+        try:
+            user = await self.api.user(uid)
+            name = str(user.get("name") or "")
+        except BiliError:
+            name = ""
+        try:
+            sub = self.subs.add(Subscription(umo=umo, uid=uid, name=name, types=types))
+        except BiliError as exc:
+            return error_response(exc.user_message, status_code=400)
+        try:
+            await self.poller.prime(sub)
+        except Exception as exc:  # noqa: BLE001
+            self.logger.debug("建立订阅基线失败：%s", exc)
+        return json_response({"ok": True, "item": sub.to_dict()})
+
+    async def page_subs_remove(self):
+        body = await self._json_body()
+        umo = str(body.get("umo") or "").strip()
+        uid = parse_uid(str(body.get("uid") or ""))
+        if not umo or not uid:
+            return error_response("需要 umo 和 uid", status_code=400)
+        removed = self.subs.remove(umo, uid)
+        return json_response({"ok": removed})
+
+    async def page_send_dm(self):
+        body = await self._json_body()
+        uid = await self._resolve_dm_uid(str(body.get("uid") or ""))
+        text = str(body.get("text") or "").strip()
+        if not uid:
+            return error_response("UID 格式不正确", status_code=400)
+        if not text:
+            return error_response("私信内容不能为空", status_code=400)
+        if bool(self.config.get("send_dm_dry_run", False)):
+            return json_response(
+                {"ok": True, "dry_run": True, "uid": uid, "text": truncate(text, 500)}
+            )
+        try:
+            await self._send_bili_dm(uid, text)
+        except BiliError as exc:
+            return error_response(exc.user_message, status_code=400)
+        except Exception as exc:  # noqa: BLE001
+            self.logger.exception("WebUI 发送私信失败")
+            return error_response(f"发送失败：{exc}", status_code=500)
+        return json_response({"ok": True, "uid": uid, "text": truncate(text, 500)})
+
+    async def page_autoreply_run(self):
+        status = self.autoreply.status()
+        if not status.get("master_enabled"):
+            return error_response("自动回复总开关未开启", status_code=400)
+        before = (status.get("stats") or {}).copy()
+        try:
+            if status.get("comments_enabled"):
+                await self.autoreply.run_comments_once()
+            if status.get("dms_enabled"):
+                await self.autoreply.run_dms_once()
+        except BiliError as exc:
+            return error_response(exc.user_message, status_code=400)
+        except Exception as exc:  # noqa: BLE001
+            self.logger.exception("WebUI 自动回复执行失败")
+            return error_response(f"执行失败：{exc}", status_code=500)
+        after = self.autoreply.status().get("stats") or {}
+        return json_response(
+            {
+                "ok": True,
+                "comment_replies": max(0, int(after.get("comment_replies", 0)) - int(before.get("comment_replies", 0))),
+                "dm_replies": max(0, int(after.get("dm_replies", 0)) - int(before.get("dm_replies", 0))),
+                "stats": after,
+            }
+        )
+
+    async def page_autoreply_reset(self):
+        try:
+            await self.autoreply.reset()
+        except Exception as exc:  # noqa: BLE001
+            return error_response(f"重置失败：{exc}", status_code=500)
+        return json_response({"ok": True})
 
     async def page_status(self):
         status = self.auth.status()

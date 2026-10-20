@@ -39,6 +39,11 @@
       "autoreply_disabled": "Disabled",
       "autoreply_comments": "Comments",
       "autoreply_dms": "DMs"
+    },
+    "console": {
+      "title": "Bilibili Console",
+      "description": "QR login, DMs, subscriptions and auto reply in one place.",
+      "heading": "Bilibili Console"
     }
   },
   "pages": {
@@ -46,6 +51,11 @@
       "title": "Bilibili Account & Subscriptions",
       "description": "Scan to sign in, inspect login state and subscription summary.",
       "heading": "Bilibili Account"
+    },
+    "console": {
+      "title": "Bilibili Console",
+      "description": "QR login, DMs, subscriptions and auto reply in one place.",
+      "heading": "Bilibili Console"
     }
   }
 }

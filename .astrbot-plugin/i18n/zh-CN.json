@@ -1,7 +1,7 @@
 {
   "metadata": {
     "display_name": "Neko BiliRelay",
-    "short_desc": "B 站搜索、查询、订阅推送与扫码登录"
+    "short_desc": "B 站搜索、订阅推送、自动回复与主动私信"
   },
   "views": {
     "login": {
@@ -39,6 +39,11 @@
       "autoreply_disabled": "未启用",
       "autoreply_comments": "评论",
       "autoreply_dms": "私信"
+    },
+    "console": {
+      "title": "B 站控制台",
+      "description": "扫码登录、发私信、管理订阅与自动回复。",
+      "heading": "B 站控制台"
     }
   },
   "pages": {
@@ -46,6 +51,11 @@
       "title": "B 站账号与订阅",
       "description": "扫码登录 B 站、查看登录态和订阅概览。",
       "heading": "B 站账号"
+    },
+    "console": {
+      "title": "B 站控制台",
+      "description": "扫码登录、发私信、管理订阅与自动回复。",
+      "heading": "B 站控制台"
     }
   }
 }

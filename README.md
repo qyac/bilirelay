@@ -2,7 +2,7 @@
 
 让 AstrBot **完整接入 Bilibili** 的插件：把 B 站搜索、视频/UP 主/动态/直播/番剧/专栏查询、字幕与 AI 总结、热门榜单，做成聊天指令和 **LLM 工具**；同时支持 UP 主**新投稿 / 新动态 / 开播**的主动订阅推送、**评论 / 私信自动回复**，以及 WebUI 扫码登录。
 
-> 插件名：`astrbot_plugin_bilirelay` · 版本：`1.2.0` · 作者：NekoHome
+> 插件名：`astrbot_plugin_bilirelay` · 版本：`1.3.0` · 作者：NekoHome
 
 ## 功能
 
@@ -96,7 +96,7 @@
 
 ### 扫码登录
 
-- 打开 AstrBot WebUI → 插件管理 → Neko BiliRelay → 页签「B 站账号与订阅」。
+- 打开 AstrBot WebUI → 插件管理 → Neko BiliRelay → 页签「B 站控制台」。
 - 点击「生成登录二维码」，用 B 站手机客户端扫码并确认。
 - 登录成功后 Cookie 自动保存到 AstrBot 的 `plugin_data` 目录，重启后仍然有效。
 - 也可以直接在聊天里发送 `/bili login`，插件会发送二维码并在后台等待扫码结果。
@@ -116,6 +116,20 @@ git clone <本仓库地址> astrbot_plugin_bilirelay
 **目录名建议使用 `astrbot_plugin_bilirelay`**（与 `metadata.yaml` 的 `name` 一致）。如果直接从仓库名安装，AstrBot 可能把目录命名为 `neko_bilirelay`，这也能加载，但配置文件名会跟着目录名变化。
 
 然后在 AstrBot WebUI → 插件管理 → 安装/重载插件，或重启 AstrBot。
+
+### WebUI 控制台
+
+安装并重载插件后，打开 AstrBot WebUI → 插件管理 → Neko BiliRelay → **B 站控制台**：
+
+- **概览**：登录态、订阅数、自动回复统计、轮询状态；
+- **账号**：扫码登录 / 退出、Cookie 来源和有效性；
+- **主动私信**：填 UID/`self` 和正文，直接发 B 站私信（受 dry-run 控制）；
+- **订阅**：按会话 UMO 添加 / 删除 UP 主，选择投稿 / 动态 / 开播；
+- **自动回复**：查看运行状态、立即跑一轮、清空去重，并直接编辑轮询间隔、模板、白名单等；
+- **设置**：订阅轮询、网络缓存、主动私信策略、粘贴 Cookie。
+
+保存设置会写入插件配置并尽量热应用（订阅间隔、轮询开关、自动回复任务等），不需要重启；
+涉及 AstrBot 原生配置页的字段时，两边以最后一次保存为准。
 
 ### 方式二：从 WebUI 安装
 
@@ -284,7 +298,7 @@ bilirelay/                  B 站客户端、接口、解析、订阅
   formatting.py             聊天文本格式化
   dynamics.py               动态结构解析
   refs.py                   BV/av/UID/直播间/番剧/专栏标识解析
-pages/login/                WebUI 扫码登录与订阅面板
+pages/console/              WebUI 控制台（账号 / 私信 / 订阅 / 自动回复 / 设置）
 .astrbot-plugin/i18n/       中英文文案
 ```
 

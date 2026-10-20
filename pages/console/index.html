@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>B 站控制台 · Neko BiliRelay</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">B</div>
+          <div class="brand-text">
+            <strong>Neko BiliRelay</strong>
+            <span>B 站控制台</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="控制台导航">
+          <button class="nav-item active" type="button" data-tab="overview">
+            <span class="nav-icon">◈</span><span>概览</span>
+          </button>
+          <button class="nav-item" type="button" data-tab="account">
+            <span class="nav-icon">◉</span><span>账号</span>
+          </button>
+          <button class="nav-item" type="button" data-tab="dm">
+            <span class="nav-icon">✉</span><span>主动私信</span>
+          </button>
+          <button class="nav-item" type="button" data-tab="subs">
+            <span class="nav-icon">◷</span><span>订阅</span>
+          </button>
+          <button class="nav-item" type="button" data-tab="autoreply">
+            <span class="nav-icon">↺</span><span>自动回复</span>
+          </button>
+          <button class="nav-item" type="button" data-tab="settings">
+            <span class="nav-icon">⚙</span><span>设置</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span id="version" class="muted">—</span>
+          <a href="https://github.com/qyac/bilirelay" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="title-block">
+            <h1 id="pageTitle">概览</h1>
+            <p id="pageDesc">登录状态、订阅和自动回复一览。</p>
+          </div>
+          <div class="top-actions">
+            <span id="loginPill" class="pill">读取中…</span>
+            <button id="refreshBtn" class="btn ghost" type="button">刷新</button>
+          </div>
+        </header>
+
+        <div id="toast" class="toast hidden" role="status"></div>
+
+        <section id="tab-overview" class="tab active">
+          <div class="hero-card">
+            <div class="hero-main">
+              <div class="status-line">
+                <span id="heroDot" class="dot"></span>
+                <span id="heroStatus">正在读取 B 站登录态…</span>
+              </div>
+              <h2 id="heroName">—</h2>
+              <p id="heroMeta" class="muted"></p>
+            </div>
+            <div class="hero-side">
+              <div class="big-number" id="heroSubs">0</div>
+              <div class="muted">订阅总数</div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value" id="statSessions">0</span>
+              <span class="stat-label">订阅会话</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="statUps">0</span>
+              <span class="stat-label">订阅 UP 主</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="statComments">0</span>
+              <span class="stat-label">已自动回评论</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="statDms">0</span>
+              <span class="stat-label">已自动回私信</span>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head">
+                <h3>订阅轮询</h3>
+                <span id="pollerPill" class="pill">—</span>
+              </div>
+              <p id="pollerInfo" class="muted">尚未检查。</p>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>自动回复</h3>
+                <span id="autoPill" class="pill">—</span>
+              </div>
+              <p id="autoInfo" class="muted">尚未运行。</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>快捷入口</h3></div>
+            <div class="quick-actions">
+              <button class="btn primary" type="button" data-goto="dm">发一条 B 站私信</button>
+              <button class="btn ghost" type="button" data-goto="subs">管理订阅</button>
+              <button class="btn ghost" type="button" data-goto="autoreply">自动回复设置</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-account" class="tab hidden">
+          <div class="card">
+            <div class="account-head">
+              <div id="avatar" class="avatar">B</div>
+              <div class="account-info">
+                <div class="status-line">
+                  <span id="accountDot" class="dot"></span>
+                  <span id="accountStatus">读取中…</span>
+                </div>
+                <h2 id="accountName">—</h2>
+                <p id="accountMeta" class="muted"></p>
+              </div>
+              <div class="account-actions">
+                <button id="authBtn" class="btn primary" type="button">扫码登录</button>
+                <button id="logoutBtn" class="btn ghost hidden" type="button">退出登录</button>
+              </div>
+            </div>
+
+            <div id="qrPanel" class="qr-panel hidden">
+              <div id="qrBox" class="qr-box"></div>
+              <div class="qr-side">
+                <p id="qrState" class="qr-state">等待扫码…</p>
+                <p class="muted">用 B 站手机客户端扫码；二维码 180 秒内有效。</p>
+                <button id="regenBtn" class="btn ghost" type="button">重新生成</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>登录态</h3></div>
+            <dl class="kv">
+              <div><dt>来源</dt><dd id="loginSource">—</dd></div>
+              <div><dt>Cookie</dt><dd id="cookieState">—</dd></div>
+              <div><dt>AI 字幕 / 总结</dt><dd id="loginNeeded">—</dd></div>
+            </dl>
+            <p class="muted">Cookie 只保存在本机 plugin_data 目录；页面不会显示完整 Cookie。</p>
+          </div>
+        </section>
+
+        <section id="tab-dm" class="tab hidden">
+          <div class="card">
+            <div class="card-head">
+              <h3>主动发 B 站私信</h3>
+              <span class="pill">管理员操作</span>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>接收者 UID</span>
+                <input id="dmUid" type="text" placeholder="12345678，或填 self 发给自己" />
+              </label>
+              <label class="field full">
+                <span>私信正文</span>
+                <textarea id="dmText" rows="5" placeholder="最多 500 字；换行会保留。"></textarea>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="sendDmBtn" class="btn primary" type="button">发送私信</button>
+              <span class="muted">dry-run 开启时只预览，不会发送。</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>订阅转发</h3></div>
+            <p class="muted">
+              在「设置 → 主动私信」里配置 <code>subscription_dm_uid</code> 和
+              <code>subscription_dm_mode</code>，新投稿 / 新动态 / 开播可以同时或只发到 B 站私信。
+            </p>
+          </div>
+        </section>
+
+        <section id="tab-subs" class="tab hidden">
+          <div class="card">
+            <div class="card-head">
+              <h3>添加订阅</h3>
+              <span class="pill">按会话隔离</span>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>会话 UMO</span>
+                <input id="subUmo" list="subSessions" type="text" placeholder="如 aiocqhttp:GroupMessage:123456" />
+                <datalist id="subSessions"></datalist>
+              </label>
+              <label class="field">
+                <span>UP 主 UID</span>
+                <input id="subUid" type="text" placeholder="如 2" />
+              </label>
+              <div class="field full">
+                <span>推送类型</span>
+                <div class="checks">
+                  <label><input type="checkbox" value="video" checked /> 新投稿</label>
+                  <label><input type="checkbox" value="dynamic" checked /> 新动态</label>
+                  <label><input type="checkbox" value="live" checked /> 开播</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button id="addSubBtn" class="btn primary" type="button">添加订阅</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>已有订阅</h3>
+              <span id="subsCount" class="pill">0</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>会话</th>
+                    <th>UP 主</th>
+                    <th>UID</th>
+                    <th>类型</th>
+                    <th>基线</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="subsBody"></tbody>
+              </table>
+              <div id="subsEmpty" class="empty hidden">还没有订阅。</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-autoreply" class="tab hidden">
+          <div class="card">
+            <div class="card-head">
+              <h3>自动回复状态</h3>
+              <span id="autoSectionPill" class="pill">—</span>
+            </div>
+            <p id="autoSectionInfo" class="muted">尚未运行。</p>
+            <div class="form-actions">
+              <button id="autoRunBtn" class="btn primary" type="button">立即跑一轮</button>
+              <button id="autoResetBtn" class="btn ghost" type="button">清空去重状态</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>自动回复设置</h3></div>
+            <div id="autoreplyFields"></div>
+            <div class="form-actions">
+              <button id="saveAutoBtn" class="btn primary" type="button">保存自动回复设置</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-settings" class="tab hidden">
+          <div class="card">
+            <div class="card-head"><h3>通用设置</h3></div>
+            <div id="settingsFields"></div>
+            <div class="notify-block">
+              <span class="field-label">订阅推送类型</span>
+              <div class="checks">
+                <label><input id="notifyVideo" type="checkbox" /> 新投稿</label>
+                <label><input id="notifyDynamic" type="checkbox" /> 新动态</label>
+                <label><input id="notifyLive" type="checkbox" /> 开播</label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button id="saveSettingsBtn" class="btn primary" type="button">保存通用设置</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>账号 Cookie</h3></div>
+            <p class="muted">
+              扫码登录会自动保存 Cookie；也可以在下面粘贴浏览器 Cookie（至少 SESSDATA + bili_jct）。
+              输入框不会回显已有 Cookie。
+            </p>
+            <div class="form-grid">
+              <label class="field full">
+                <span>新的 Cookie</span>
+                <textarea id="cookieInput" rows="3" placeholder="SESSDATA=...; bili_jct=...;"></textarea>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button id="saveCookieBtn" class="btn primary" type="button">保存并应用 Cookie</button>
+            </div>
+          </div>
+        </section>
+
+        <footer class="page-foot">
+          <span>Neko BiliRelay · 数据保存在 AstrBot 的 plugin_data 目录</span>
+          <span id="footVersion" class="muted"></span>
+        </footer>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
