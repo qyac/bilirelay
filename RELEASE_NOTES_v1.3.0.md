@@ -1,0 +1,101 @@
+# Neko BiliRelay v1.3.0
+
+**AstrBot 插件 1.3.0 · dsh-bili-scroll 0.1.19 · 2026-10-20**
+
+这是一个功能合并版本：AstrBot 插件新增完整 WebUI 控制台、主动 B 站私信和订阅私信转发；
+同时包含移植到 `dsh-bili-scroll` 的评论 / 私信自动回复。
+
+## 亮点
+
+### AstrBot 插件 1.3.0
+
+- **完整 WebUI 控制台**（替换原扫码登录页）：
+  - 概览：登录态、订阅数、自动回复统计、轮询状态
+  - 账号：扫码登录 / 退出、Cookie 来源与有效性
+  - 主动私信：填 UID 或 `self`，直接发 B 站私信
+  - 订阅：按会话 UMO 添加 / 删除 UP 主，选择投稿 / 动态 / 开播
+  - 自动回复：运行状态、立即跑一轮、清空去重、编辑轮询间隔 / 模板 / 白名单
+  - 设置：订阅轮询、网络缓存、主动私信策略、粘贴 Cookie
+- **主动私信**：
+  - 聊天指令 `/bili send <UID/self> <文本>`，默认仅管理员
+  - LLM 工具 `bilibili_send_dm`，默认关闭 + UID 白名单
+  - 订阅推送可转发到 B 站私信（`off` / `both` / `only`）
+- **评论 / 私信自动回复**：默认关；首次基线、rpid/msg_key 去重、冷却、每轮上限、私信白名单、dry-run。
+- 保存 WebUI 设置后尽量热应用，不需要重启。
+
+### dsh-bili-scroll 0.1.19
+
+- 新增 `lib/autoreply.mjs` 自动回复引擎；
+- MCP 新增 `bili_latest_comments` / `bili_my_videos` / `bili_dm_sessions` / `bili_dm_messages`；
+- 宿主定时器、配置、设置页和状态接口；
+- 自动回复逻辑移植并改写自 **Neko BiliRelay**（MIT，Copyright (c) 2026 NekoHome）；
+  读取层复用内置 bilibili-mcp（MIT，AGI_Ananas）。
+
+## 资产
+
+| 文件 | 用途 |
+| --- | --- |
+| `astrbot_plugin_bilirelay-1.3.0.zip` | AstrBot 插件，解压后目录名必须是 `astrbot_plugin_bilirelay` |
+| `dsh-bili-scroll-0.1.19.zip` | DSH 插件源码包 |
+| `dsh-bili-scroll-0.1.19.tgz` | DSH npm 包，含 `package.json` / `client.js` / `lib/autoreply.mjs` |
+| `SHA256SUMS.txt` | 上述文件的 SHA-256 |
+
+```text
+42a46fc3530025a555aadef0255c5090d760b3d7c0c9b23a70c011bddc6d8d23  astrbot_plugin_bilirelay-1.3.0.zip
+6daefdc86d29e219f4007e3bc6bd63db026f79035a03ca182c8feb65d611d9fe  dsh-bili-scroll-0.1.19.zip
+85a4ba60c5b84b83989efbc64c8e5ec207d21ec9d89eb71179d1331f4c736e0c  dsh-bili-scroll-0.1.19.tgz
+```
+
+校验：
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+## AstrBot 安装
+
+1. 下载 `astrbot_plugin_bilirelay-1.3.0.zip` 并解压；
+2. 把解压出的 `astrbot_plugin_bilirelay/` 放到 AstrBot 的 `data/plugins/` 下
+   （确保 `metadata.yaml` 就在这个目录里）；
+3. 安装依赖：
+
+   ```bash
+   pip install -r astrbot_plugin_bilirelay/requirements.txt
+   ```
+
+4. 重启 AstrBot（或在 WebUI 插件管理里重载）；
+5. 打开 **AstrBot WebUI → 插件管理 → Neko BiliRelay → B 站控制台**；
+6. 先用「账号」扫码登录，再按需开启订阅 / 自动回复 / 主动私信。
+
+> WebUI 控制台需要 AstrBot `>=4.26`；更早版本仍可用聊天指令和 LLM 工具。
+
+### 从 1.2.0 升级
+
+直接覆盖旧插件目录即可。订阅、登录凭据和自动回复状态在 AstrBot 的 `plugin_data` 目录，
+不会随插件包覆盖；升级后重载插件，再到控制台确认登录态和设置。
+
+## dsh-bili-scroll 安装
+
+优先使用 npm 包：
+
+```bash
+dsh plugin --profile web add ./dsh-bili-scroll-0.1.19.tgz
+```
+
+或解压 `dsh-bili-scroll-0.1.19.zip`，把 `dsh-bili-scroll/` 作为插件目录安装。
+安装后重启 DSH，在 **设置 → 刷B站** 里配置。
+
+## 已知限制
+
+- 主动私信、评论自动回复都需要 B 站登录；私信通常还要求账号绑定手机号。
+- B 站评论 / 私信有频率限制，默认配置已限速；请从低频、白名单、dry-run 开始。
+- 自动回复的“评论 / 私信”是模板或 LLM 回复，实际发送效果取决于登录账号状态和 B 站风控。
+- 发布前未用真实账号做批量发送测试，只做了接口构造、离线逻辑和假请求验证。
+
+## 出处与许可
+
+- 本插件：MIT，Copyright (c) 2026 NekoHome。
+- 自动回复设计来源：**Neko BiliRelay**（`astrbot_plugin_bilirelay`），
+  <https://github.com/qyac/bilirelay>。
+- 内置 `vendor/bilibili-mcp`：MIT，Copyright (c) 2026 AGI_Ananas。
+- 完整第三方声明见 `NOTICE.md` 与 `dsh-bili-scroll/NOTICE.md`。

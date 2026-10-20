@@ -16,3 +16,5 @@ tests/.tmp/
 .ruff_cache/
 .DS_Store
 Thumbs.db
+release/
+.npm-cache/
