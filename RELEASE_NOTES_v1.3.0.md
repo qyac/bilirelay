@@ -22,6 +22,8 @@
   - 订阅推送可转发到 B 站私信（`off` / `both` / `only`）
 - **评论 / 私信自动回复**：默认关；首次基线、rpid/msg_key 去重、冷却、每轮上限、私信白名单、dry-run。
 - 保存 WebUI 设置后尽量热应用，不需要重启。
+- **修复**：子模块日志统一走 AstrBot 的插件 logger，避免出现
+  `Formatting field not found in record: 'plugin_tag'`。
 
 ### dsh-bili-scroll 0.1.19（基于 c1overzz/dsh-bili-scroll）
 
@@ -45,7 +47,7 @@
 | `SHA256SUMS.txt` | 上述文件的 SHA-256 |
 
 ```text
-f564d24155be9daf1cb038440afc5d9702bb9716f586dda88067b88e5c735605  astrbot_plugin_bilirelay-1.3.0.zip
+224ef7c52261a97f4f39f797719531ed6e6b9b550ed19d17bd9b54768edb87b9  astrbot_plugin_bilirelay-1.3.0.zip
 172f674a9714cd79c1ef244c6782533ccd9d01dc7c41075790458cfe4570906e  dsh-bili-scroll-0.1.19.zip
 c8f7e74c011e4abf7ba9fe24892f72bbaf0e8f730fc036ac0fb763e1bb25e975  dsh-bili-scroll-0.1.19.tgz
 ```

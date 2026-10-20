@@ -24,7 +24,7 @@ import httpx
 
 from .errors import BiliError, NotLoggedIn, NotFound, RiskControl
 
-logger = logging.getLogger("astrbot.plugin.bilirelay")
+from .logging_utils import logger
 
 API_BASE = "https://api.bilibili.com"
 PASSPORT_BASE = "https://passport.bilibili.com"

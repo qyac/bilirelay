@@ -21,7 +21,7 @@ from .formatting import (
     truncate,
 )
 
-logger = logging.getLogger("astrbot.plugin.bilirelay")
+from .logging_utils import logger
 
 ALL_TYPES = ("video", "dynamic", "live")
 TYPE_ALIASES = {

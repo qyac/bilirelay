@@ -12,7 +12,7 @@ from typing import Any
 
 from .client import BiliClient
 
-logger = logging.getLogger("astrbot.plugin.bilirelay")
+from .logging_utils import logger
 
 
 class CredentialStore:

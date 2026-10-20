@@ -27,7 +27,7 @@ from .errors import BiliError, NotLoggedIn, RiskControl
 from .formatting import truncate
 from .refs import parse_uid
 
-logger = logging.getLogger("astrbot.plugin.bilirelay")
+from .logging_utils import logger
 
 _BV_RE = re.compile(r"BV[0-9A-Za-z]{10}")
 
