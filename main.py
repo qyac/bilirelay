@@ -291,13 +291,18 @@ class BiliRelayPlugin(Star):
         mode = str(self.config.get("subscription_dm_mode", "off") or "off").lower()
         dm_uid = await self._resolve_dm_uid(str(self.config.get("subscription_dm_uid", "") or ""))
         if dm_uid and mode in ("both", "only"):
-            try:
-                await self._send_bili_dm(dm_uid, text)
-                self.logger.info("订阅推送已转发到 B 站私信 UID %s", dm_uid)
+            if bool(self.config.get("send_dm_dry_run", False)):
+                self.logger.info("[dry-run] 订阅推送将转发到 B 站私信 UID %s：%s", dm_uid, truncate(text, 200))
                 if mode == "only":
-                    return
-            except Exception as exc:  # noqa: BLE001
-                self.logger.warning("订阅推送转发 B 站私信失败，回退到聊天：%s", exc)
+                    mode = "both"  # dry-run 的 only 模式回退到聊天，避免完全静音
+            else:
+                try:
+                    await self._send_bili_dm(dm_uid, text)
+                    self.logger.info("订阅推送已转发到 B 站私信 UID %s", dm_uid)
+                    if mode == "only":
+                        return
+                except Exception as exc:  # noqa: BLE001
+                    self.logger.warning("订阅推送转发 B 站私信失败，回退到聊天：%s", exc)
         chain = MessageChain().message(self._clip(text))
         if cover_url and bool(self.config.get("push_cover", False)):
             try:

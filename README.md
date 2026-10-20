@@ -89,7 +89,7 @@
 - **LLM 工具**：`bilibili_send_dm`。默认关闭；开启 `enable_llm_send_dm` 后，仍只允许发给 `llm_send_dm_whitelist` 里的 UID（或自己）。
 - **订阅转发**：`subscription_dm_uid` + `subscription_dm_mode` 可把新投稿/新动态/开播推送转发到 B 站私信；
   `mode=both` 同时发聊天，`mode=only` 只发私信（发送失败会自动回退聊天）。
-- **dry-run**：`send_dm_dry_run=true` 时命令/工具只预览不发送，方便确认内容。
+- **dry-run**：`send_dm_dry_run=true` 时命令/工具只预览不发送；订阅转发也会跳过私信（`only` 模式会回退聊天）。
 
 > 私信会拿你的号主动打扰别人，也可能触发 B 站频率限制；默认仅管理员、默认关闭 LLM 工具、默认白名单。
 > 未绑定手机号的账号可能无法发私信。
